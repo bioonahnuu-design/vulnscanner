@@ -18,8 +18,8 @@ export default function App() {
     setAiLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/scan",
+      const response = await fetch(
+        "https://vulnscanner-production-c4ac.up.railway.app/scan",
         {
           target: target,
         },
