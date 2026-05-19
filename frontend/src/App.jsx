@@ -2,6 +2,8 @@ import "./App.css";
 import { useState } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
+import "canvg";
+import React from "react";
 
 export default function App() {
   const [target, setTarget] = useState("");
