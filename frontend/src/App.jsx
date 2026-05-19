@@ -1,8 +1,7 @@
 import "./App.css";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { jsPDF } from "jspdf";
-import React from "react";
 
 export default function App() {
   const [target, setTarget] = useState("");
@@ -53,26 +52,23 @@ export default function App() {
     const doc = new jsPDF();
 
     doc.setFontSize(20);
-
     doc.text("AI Security Report", 20, 20);
 
     doc.setFontSize(12);
 
     doc.text(`Target: ${result.target}`, 20, 40);
-
     doc.text(`IP Address: ${result.ip}`, 20, 50);
-
     doc.text(`Risk Level: ${result.risk}`, 20, 60);
 
     // PORTS
-    let portsText = result.ports
+    const portsText = result.ports
       .map((p) => `${p.port} (${p.service})`)
       .join(", ");
 
     doc.text(`Open Ports: ${portsText}`, 20, 80);
 
     // VULNS
-    let vulnText =
+    const vulnText =
       result.vulnerabilities.length > 0
         ? result.vulnerabilities.map((v) => `${v.port}: ${v.issue}`).join(", ")
         : "No critical vulnerabilities";
@@ -136,7 +132,6 @@ export default function App() {
               {loading ? (
                 <div className="scan-loading">
                   <div className="spinner"></div>
-
                   <span>Scanning...</span>
                 </div>
               ) : (
@@ -158,7 +153,6 @@ export default function App() {
             <div className="mini-grid">
               <div>
                 <span>IP</span>
-
                 <h4>{result?.ip || "---"}</h4>
               </div>
 
@@ -185,7 +179,6 @@ export default function App() {
               {result?.ports?.map((item, index) => (
                 <div className="port-card" key={index}>
                   <h3>{item.port}</h3>
-
                   <p>{item.service}</p>
                 </div>
               ))}
@@ -201,7 +194,6 @@ export default function App() {
                 Object.entries(result.headers).map(([key, value]) => (
                   <div className="header-card" key={key}>
                     <h4>{key}</h4>
-
                     <p>{value}</p>
                   </div>
                 ))}
@@ -217,14 +209,12 @@ export default function App() {
                 result.vulnerabilities.map((item, index) => (
                   <div className="header-card" key={index}>
                     <h4>Port {item.port}</h4>
-
                     <p>{item.issue}</p>
                   </div>
                 ))
               ) : (
                 <div className="header-card">
                   <h4>No Critical Vulnerabilities</h4>
-
                   <p>Target appears relatively safe.</p>
                 </div>
               )}
@@ -240,7 +230,6 @@ export default function App() {
                 {aiLoading ? (
                   <div className="ai-loading">
                     <div className="spinner"></div>
-
                     <p>🤖 AI is analyzing vulnerabilities...</p>
                   </div>
                 ) : (
@@ -269,9 +258,7 @@ export default function App() {
               {history.map((item, index) => (
                 <div className="header-card" key={index}>
                   <h4>{item.target}</h4>
-
                   <p>IP: {item.ip}</p>
-
                   <p>Risk: {item.risk}</p>
                 </div>
               ))}
@@ -283,7 +270,6 @@ export default function App() {
       {/* FOOTER */}
       <footer className="footer">
         <p>Built with React + Flask</p>
-
         <span>by Nahnu Rohmania</span>
       </footer>
     </div>
