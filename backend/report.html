@@ -1,0 +1,46 @@
+
+    <html>
+    <head>
+        <title>Vulnerability Report</title>
+        <style>
+            body { font-family: Arial; background: #0f172a; color: #e2e8f0; }
+            h1 { color: #38bdf8; }
+            .card {
+                background: #1e293b;
+                padding: 15px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .open { color: #22c55e; }
+        </style>
+    </head>
+    <body>
+        <h1>🔐 Vulnerability Scan Report</h1>
+    
+        <div class="card">
+            <h2>Target: example.com</h2>
+            <p><b>Open Ports:</b></p>
+            <ul>
+        <li class='open'>25 (SMTP)</li><li class='open'>53 (DNS)</li><li class='open'>80 (HTTP)</li><li class='open'>110 (POP3)</li><li class='open'>143 (IMAP)</li><li class='open'>443 (HTTPS)</li><li class='open'>8080 (HTTP-Alt)</li><p><b>Headers:</b></p><ul><li>Date: Mon, 04 May 2026 17:14:49 GMT</li><li>Content-Type: text/html</li><li>Transfer-Encoding: chunked</li><li>Connection: keep-alive</li><li>Server: cloudflare</li><li>Last-Modified: Fri, 01 May 2026 01:24:29 GMT</li><li>Allow: GET, HEAD</li><li>Age: 15</li><li>cf-cache-status: HIT</li><li>Content-Encoding: gzip</li><li>CF-RAY: 9f6924d99fa08bcc-SIN</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>Target: google.com</h2>
+            <p><b>Open Ports:</b></p>
+            <ul>
+        <li class='open'>25 (SMTP)</li><li class='open'>53 (DNS)</li><li class='open'>80 (HTTP)</li><li class='open'>110 (POP3)</li><li class='open'>143 (IMAP)</li><li class='open'>443 (HTTPS)</li><p><b>Headers:</b></p><ul><li>Content-Type: text/html; charset=ISO-8859-1</li><li>Date: Mon, 04 May 2026 17:14:50 GMT</li><li>Expires: -1</li><li>Cache-Control: private, max-age=0</li><li>Content-Security-Policy-Report-Only: object-src 'none';base-uri 'self';script-src 'nonce-eg48aJA0N1uDG3cOJljoPw' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp</li><li>P3P: CP="This is not a P3P policy! See g.co/p3phelp for more info."</li><li>Content-Encoding: gzip</li><li>Server: gws</li><li>Content-Length: 27478</li><li>X-XSS-Protection: 0</li><li>X-Frame-Options: SAMEORIGIN</li><li>Set-Cookie: __Secure-STRP=AEEP7gIFkAVFGkSVNdc8LyUB2O2_JHn_72Xjuja_myvtQCwBQ-8RZpgbbe-KyrHDKptPmVqxxriywiPKymY1VKazqsL4ZFGci5-r; expires=Mon, 04-May-2026 17:19:50 GMT; path=/; domain=.google.com; Secure; SameSite=strict, AEC=AaJma5sb5tlbXtIEEtLg4Cg60N9Y-OtYdur3QFCP6Ea_c1cyoZQ3RZiKSUQ; expires=Sat, 31-Oct-2026 17:14:50 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax, NID=531=RQmFsVvnTcuYG3BqGPHCLGnKrbM6dolp1deqALrRPMYTX9LIN1fLn0lZM6wXRsLHGL053Di24Ju0mseTwLjuv_KCEfxHr4i7oD7nwTywNzIG4IrNlO5Tg2CR2JbmsOWJ9N3XeVtexoqh_VBlTfxg-anETkp6O1R0tp7uDR6tiT5m-gEWoekVMXziZYkhDovXutL0kTnyAfWXZz8rBvOT1kTI0s9gsoEpQok; expires=Tue, 03-Nov-2026 17:14:50 GMT; path=/; domain=.google.com; HttpOnly</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>Target: scanme.nmap.org</h2>
+            <p><b>Open Ports:</b></p>
+            <ul>
+        <li class='open'>22 (SSH)</li><li class='open'>25 (SMTP)</li><li class='open'>53 (DNS)</li><li class='open'>80 (HTTP)</li><li class='open'>110 (POP3)</li><li class='open'>143 (IMAP)</li><p><b>Headers:</b></p><ul><li>Date: Mon, 04 May 2026 17:14:50 GMT</li><li>Server: Apache/2.4.7 (Ubuntu)</li><li>Accept-Ranges: bytes</li><li>Vary: Accept-Encoding</li><li>Content-Encoding: gzip</li><li>Content-Length: 2068</li><li>Keep-Alive: timeout=5, max=100</li><li>Connection: Keep-Alive</li><li>Content-Type: text/html</li>
+            </ul>
+        </div>
+        
+    </body>
+    </html>
+    

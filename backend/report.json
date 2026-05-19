@@ -1,0 +1,131 @@
+[
+  {
+    "target": "example.com",
+    "open_ports": [
+      {
+        "port": 25,
+        "service": "SMTP"
+      },
+      {
+        "port": 53,
+        "service": "DNS"
+      },
+      {
+        "port": 80,
+        "service": "HTTP"
+      },
+      {
+        "port": 110,
+        "service": "POP3"
+      },
+      {
+        "port": 143,
+        "service": "IMAP"
+      },
+      {
+        "port": 443,
+        "service": "HTTPS"
+      },
+      {
+        "port": 8080,
+        "service": "HTTP-Alt"
+      }
+    ],
+    "headers": {
+      "Date": "Mon, 04 May 2026 17:14:49 GMT",
+      "Content-Type": "text/html",
+      "Transfer-Encoding": "chunked",
+      "Connection": "keep-alive",
+      "Server": "cloudflare",
+      "Last-Modified": "Fri, 01 May 2026 01:24:29 GMT",
+      "Allow": "GET, HEAD",
+      "Age": "15",
+      "cf-cache-status": "HIT",
+      "Content-Encoding": "gzip",
+      "CF-RAY": "9f6924d99fa08bcc-SIN"
+    }
+  },
+  {
+    "target": "google.com",
+    "open_ports": [
+      {
+        "port": 25,
+        "service": "SMTP"
+      },
+      {
+        "port": 53,
+        "service": "DNS"
+      },
+      {
+        "port": 80,
+        "service": "HTTP"
+      },
+      {
+        "port": 110,
+        "service": "POP3"
+      },
+      {
+        "port": 143,
+        "service": "IMAP"
+      },
+      {
+        "port": 443,
+        "service": "HTTPS"
+      }
+    ],
+    "headers": {
+      "Content-Type": "text/html; charset=ISO-8859-1",
+      "Date": "Mon, 04 May 2026 17:14:50 GMT",
+      "Expires": "-1",
+      "Cache-Control": "private, max-age=0",
+      "Content-Security-Policy-Report-Only": "object-src 'none';base-uri 'self';script-src 'nonce-eg48aJA0N1uDG3cOJljoPw' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp",
+      "P3P": "CP=\"This is not a P3P policy! See g.co/p3phelp for more info.\"",
+      "Content-Encoding": "gzip",
+      "Server": "gws",
+      "Content-Length": "27478",
+      "X-XSS-Protection": "0",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Set-Cookie": "__Secure-STRP=AEEP7gIFkAVFGkSVNdc8LyUB2O2_JHn_72Xjuja_myvtQCwBQ-8RZpgbbe-KyrHDKptPmVqxxriywiPKymY1VKazqsL4ZFGci5-r; expires=Mon, 04-May-2026 17:19:50 GMT; path=/; domain=.google.com; Secure; SameSite=strict, AEC=AaJma5sb5tlbXtIEEtLg4Cg60N9Y-OtYdur3QFCP6Ea_c1cyoZQ3RZiKSUQ; expires=Sat, 31-Oct-2026 17:14:50 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax, NID=531=RQmFsVvnTcuYG3BqGPHCLGnKrbM6dolp1deqALrRPMYTX9LIN1fLn0lZM6wXRsLHGL053Di24Ju0mseTwLjuv_KCEfxHr4i7oD7nwTywNzIG4IrNlO5Tg2CR2JbmsOWJ9N3XeVtexoqh_VBlTfxg-anETkp6O1R0tp7uDR6tiT5m-gEWoekVMXziZYkhDovXutL0kTnyAfWXZz8rBvOT1kTI0s9gsoEpQok; expires=Tue, 03-Nov-2026 17:14:50 GMT; path=/; domain=.google.com; HttpOnly"
+    }
+  },
+  {
+    "target": "scanme.nmap.org",
+    "open_ports": [
+      {
+        "port": 22,
+        "service": "SSH"
+      },
+      {
+        "port": 25,
+        "service": "SMTP"
+      },
+      {
+        "port": 53,
+        "service": "DNS"
+      },
+      {
+        "port": 80,
+        "service": "HTTP"
+      },
+      {
+        "port": 110,
+        "service": "POP3"
+      },
+      {
+        "port": 143,
+        "service": "IMAP"
+      }
+    ],
+    "headers": {
+      "Date": "Mon, 04 May 2026 17:14:50 GMT",
+      "Server": "Apache/2.4.7 (Ubuntu)",
+      "Accept-Ranges": "bytes",
+      "Vary": "Accept-Encoding",
+      "Content-Encoding": "gzip",
+      "Content-Length": "2068",
+      "Keep-Alive": "timeout=5, max=100",
+      "Connection": "Keep-Alive",
+      "Content-Type": "text/html"
+    }
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "target": "example.com",
+  "open_ports": [25, 53, 80, 110, 143, 443, 8080],
+  "headers": {
+    "Date": "Mon, 04 May 2026 16:09:30 GMT",
+    "Content-Type": "text/html",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Server": "cloudflare",
+    "Last-Modified": "Fri, 01 May 2026 01:24:29 GMT",
+    "Allow": "GET, HEAD",
+    "Age": "480",
+    "cf-cache-status": "HIT",
+    "Content-Encoding": "gzip",
+    "CF-RAY": "9f68c52a8d341ff3-SIN"
+  }
+}
