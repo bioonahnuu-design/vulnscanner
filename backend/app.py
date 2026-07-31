@@ -1,235 +1,254 @@
-from google import genai
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import logging
 import os
-import socket
-import requests
-import urllib3
 
-urllib3.disable_warnings(
-    urllib3.exceptions.InsecureRequestWarning
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from google import genai
+
+try:
+    from .modules.http_scanner import scan_http
+    from .modules.port_scanner import PortScanError, scan_ports
+    from .modules.target_validator import TargetValidationError, validate_target
+    from .modules.vuln_checker import analyze_vulnerabilities
+except ImportError:
+    from modules.http_scanner import scan_http
+    from modules.port_scanner import PortScanError, scan_ports
+    from modules.target_validator import TargetValidationError, validate_target
+    from modules.vuln_checker import analyze_vulnerabilities
+
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 4096
 
-CORS(app, resources={r"/*": {"origins": "*"}})
 
-# GEMINI SETUP
-# Secrets must be configured through environment variables and never committed.
+def get_allowed_origins():
+    configured_origins = os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173",
+    )
+
+    return [
+        origin.strip()
+        for origin in configured_origins.split(",")
+        if origin.strip()
+    ]
+
+
+CORS(
+    app,
+    resources={
+        r"/scan": {
+            "origins": get_allowed_origins(),
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+        },
+        r"/health": {
+            "origins": get_allowed_origins(),
+            "methods": ["GET"],
+        },
+    },
+)
+
 gemini_api_key = os.getenv("GEMINI_API_KEY", "").strip()
-client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
+gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
 
-COMMON_PORTS = {
-    21: "ftp",
-    22: "ssh",
-    23: "telnet",
-    25: "smtp",
-    53: "dns",
-    80: "http",
-    110: "pop3",
-    135: "rpc",
-    139: "netbios",
-    143: "imap",
-    443: "https",
-    445: "smb",
-    3306: "mysql",
-    3389: "rdp",
-    8080: "http-proxy"
-}
+gemini_client = (
+    genai.Client(api_key=gemini_api_key)
+    if gemini_api_key
+    else None
+)
 
 
-def detect_risk(open_ports_count):
+def build_fallback_analysis(findings):
+    recommendations = []
 
-    if open_ports_count >= 8:
-        return "High"
+    for finding in findings:
+        recommendation = finding.get("recommendation")
 
-    elif open_ports_count >= 4:
-        return "Medium"
+        if recommendation and recommendation not in recommendations:
+            recommendations.append(recommendation)
 
-    else:
-        return "Low"
+        if len(recommendations) == 3:
+            break
+
+    default_recommendations = [
+        "Restrict unnecessary services to trusted network sources.",
+        "Keep exposed services patched and monitor their access logs.",
+        "Verify these heuristic findings through an authorized manual review.",
+    ]
+
+    for recommendation in default_recommendations:
+        if recommendation not in recommendations:
+            recommendations.append(recommendation)
+
+        if len(recommendations) == 3:
+            break
+
+    return "\n".join(
+        f"• {recommendation}"
+        for recommendation in recommendations
+    )
 
 
-@app.route("/")
-def home():
+def generate_ai_analysis(target, ports, risk, findings):
+    fallback = build_fallback_analysis(findings)
 
-    return jsonify({
-        "message": "VulnScanner Backend Running"
-    })
+    if gemini_client is None:
+        return fallback, "fallback"
 
-
-@app.route("/scan", methods=["POST"])
-def scan_target():
-
-    print("SCAN HIT")
-
-    try:
-
-        data = request.get_json()
-
-        print(data)
-
-        if not data:
-            return jsonify({
-                "error": "No data received"
-            }), 400
-
-        target = data.get("target")
-
-        if not target:
-            return jsonify({
-                "error": "No target provided"
-            }), 400
-
-        # CLEAN TARGET
-        target = target.strip()
-        target = target.replace("http://", "")
-        target = target.replace("https://", "")
-        target = target.split("/")[0]
-
-        # GET IP
-        try:
-
-            ip = socket.gethostbyname(target)
-
-        except Exception:
-
-            return jsonify({
-                "error": "Invalid hostname"
-            }), 400
-
-        # OPEN PORTS
-        ports_data = []
-
-        for port, service in COMMON_PORTS.items():
-
-            try:
-
-                s = socket.socket(
-                    socket.AF_INET,
-                    socket.SOCK_STREAM
-                )
-
-                s.settimeout(0.5)
-
-                result = s.connect_ex((ip, port))
-
-                if result == 0:
-
-                    ports_data.append({
-                        "port": port,
-                        "service": service
-                    })
-
-                s.close()
-
-            except Exception:
-                pass
-
-        # HTTP HEADERS
-        headers = {}
-
-        try:
-
-            url = f"http://{target}"
-
-            response = requests.get(
-                url,
-                timeout=3,
-                verify=False
-            )
-
-            headers = dict(response.headers)
-
-        except Exception:
-
-            headers = {
-                "Server": "Unknown",
-                "Connection": "Unknown"
-            }
-
-        # VULNERABILITIES
-        vulnerabilities = []
-
-        risky_ports = {
-            21: "FTP exposed",
-            23: "Telnet insecure protocol",
-            445: "SMB exposure",
-            3389: "RDP exposed"
+    compact_ports = [
+        {
+            "port": item.get("port"),
+            "service": item.get("service"),
         }
+        for item in ports
+    ]
 
-        for item in ports_data:
+    compact_findings = [
+        {
+            "severity": item.get("severity"),
+            "issue": item.get("issue"),
+        }
+        for item in findings[:10]
+    ]
 
-            port = item["port"]
+    prompt = f"""
+You are assisting with an authorized defensive security assessment.
 
-            if port in risky_ports:
+Target hostname: {target}
+Detected services: {compact_ports}
+Risk classification: {risk}
+Findings: {compact_findings}
 
-                vulnerabilities.append({
-                    "port": port,
-                    "issue": risky_ports[port]
-                })
-
-        # RISK
-        risk = detect_risk(len(ports_data))
-
-        # AI ANALYSIS
-        prompt = f"""
-
-Analyze this cybersecurity scan briefly.
-
-Open Ports:
-{ports_data}
-
-Risk Level:
-{risk}
-
-Give:
-- possible risks
-- short recommendations
-
-Maximum 3 bullet points.
+Give exactly three concise defensive recommendations.
+Do not provide exploitation instructions.
 """
 
-        ai_analysis = (
-            "• Several ports are publicly accessible.\n\n"
-            "• Open ports may increase attack surface.\n\n"
-            "• Ensure firewall protection is enabled and disable unused services."
+    try:
+        response = gemini_client.models.generate_content(
+            model=gemini_model,
+            contents=prompt,
         )
 
-        if client is not None:
-            try:
-                response = client.models.generate_content(
-                    model="gemini-1.5-flash",
-                    contents=prompt
+        generated_text = getattr(response, "text", "").strip()
+
+        if generated_text:
+            return generated_text, "gemini"
+
+        return fallback, "fallback"
+
+    except Exception as error:
+        logger.warning(
+            "Gemini analysis unavailable: %s",
+            type(error).__name__,
+        )
+        return fallback, "fallback"
+
+
+@app.get("/")
+def home():
+    return jsonify(
+        {
+            "name": "VulnScanner API",
+            "status": "running",
+            "authorized_use_only": True,
+            "ai_configured": gemini_client is not None,
+            "ai_model": gemini_model if gemini_client is not None else None,
+        }
+    )
+
+
+@app.get("/health")
+def health():
+    return jsonify(
+        {
+            "status": "healthy",
+            "ai_configured": gemini_client is not None,
+        }
+    )
+
+
+@app.post("/scan")
+def scan_target():
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    raw_target = data.get("target", "")
+
+    try:
+        target, ip_address = validate_target(raw_target)
+
+        open_ports = scan_ports(ip_address)
+        http_result = scan_http(target)
+        analysis = analyze_vulnerabilities(open_ports, http_result)
+
+        ai_analysis, analysis_source = generate_ai_analysis(
+            target=target,
+            ports=open_ports,
+            risk=analysis["risk"],
+            findings=analysis["findings"],
+        )
+
+        return jsonify(
+            {
+                "target": target,
+                "ip": ip_address,
+                "risk": analysis["risk"],
+                "risk_score": analysis["score"],
+                "ports": open_ports,
+                "headers": http_result.get("headers", {}),
+                "http": {
+                    "available": http_result.get("available", False),
+                    "url": http_result.get("url"),
+                    "protocol": http_result.get("protocol"),
+                    "status_code": http_result.get("status_code"),
+                    "error": http_result.get("error"),
+                },
+                "vulnerabilities": analysis["findings"],
+                "severity_count": analysis["severity_count"],
+                "ai_analysis": ai_analysis,
+                "analysis_source": analysis_source,
+            }
+        )
+
+    except TargetValidationError as error:
+        return jsonify({"error": str(error)}), 400
+
+    except PortScanError as error:
+        logger.warning("Port scan failed: %s", error)
+        return jsonify(
+            {
+                "error": (
+                    "Port scanner is unavailable. "
+                    "Check the Nmap installation."
                 )
-                ai_analysis = response.text
-            except Exception:
-                # The scanner remains usable when the AI provider is unavailable.
-                pass
+            }
+        ), 503
 
-        return jsonify({
-            "target": target,
-            "ip": ip,
-            "risk": risk,
-            "ports": ports_data,
-            "headers": headers,
-            "vulnerabilities": vulnerabilities,
-            "ai_analysis": ai_analysis
-        })
+    except Exception:
+        logger.exception("Unexpected scan error")
+        return jsonify(
+            {"error": "An unexpected server error occurred."}
+        ), 500
 
-    except Exception as e:
 
-        print("BACKEND ERROR:", e)
-
-        return jsonify({
-            "error": str(e)
-        }), 500
+@app.errorhandler(413)
+def request_too_large(_error):
+    return jsonify({"error": "Request body is too large."}), 413
 
 
 if __name__ == "__main__":
-
     app.run(
         host="0.0.0.0",
-        port=5000,
-        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true"
+        port=int(os.getenv("PORT", "5000")),
+        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true",
     )
