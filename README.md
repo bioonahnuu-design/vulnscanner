@@ -1,16 +1,38 @@
+<p align="center">
+  <img src="docs/assets/vulnscanner-banner.svg" alt="VulnScanner v2 — Nahnu Security Lab" width="100%" />
+</p>
+
 <div align="center">
 
-<h1>VULNSCANNER <sup>v2</sup></h1>
-
-Surface the ports. Explain the risk.
-
-An AI-assisted network exposure assessment dashboard built for authorized defensive security testing.
+A focused network-exposure assessor for authorized defensive security testing.
 
 REACT UI  ->  FLASK API  ->  NMAP + HTTP  ->  RISK ENGINE  ->  GEMINI
 
 </div>
 
+<table>
+  <tr>
+    <td align="center"><sub>ENGINE</sub><br><b>NMAP 7.x</b></td>
+    <td align="center"><sub>MODE</sub><br><b>DEFENSIVE</b></td>
+    <td align="center"><sub>AI LAYER</sub><br><b>GEMINI + FALLBACK</b></td>
+    <td align="center"><sub>RISK MODEL</sub><br><b>HEURISTIC</b></td>
+    <td align="center"><sub>RELEASE</sub><br><b>v2.0.0</b></td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="#mission">Mission</a> •
+  <a href="#interface">Interface</a> •
+  <a href="#pipeline">Pipeline</a> •
+  <a href="#nmap">Nmap</a> •
+  <a href="#ai">AI Layer</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#api">API</a>
+</p>
+
 [!CAUTION]Authorized use only. Scan only systems you own or have explicit permission to assess. Results are educational indicators, not proof of compromise, and must be verified manually.
+
+<a id="mission"></a>
 
 01 / MISSION
 
@@ -46,7 +68,11 @@ AI guidance
 
 Gemini-generated recommendations or deterministic fallback
 
+<a id="interface"></a>
+
 02 / INTERFACE PREVIEW
+
+Operator view. The interface prioritizes evidence over decoration: resolved target, open services, HTTP signals, heuristic score, scan duration, timestamp, and the source of remediation guidance.
 
 <p align="center">
   <img src="docs/screenshots/dashboard-overview.png" alt="VulnScanner v2 dashboard" width="100%" />
@@ -62,6 +88,8 @@ Gemini-generated recommendations or deterministic fallback
     <td><img src="docs/screenshots/exposure-report.png" alt="Exposure report and remediation" /></td>
   </tr>
 </table>
+
+<a id="pipeline"></a>
 
 03 / ASSESSMENT PIPELINE
 
@@ -126,6 +154,8 @@ Gemini Layer
 Generate three defensive recommendations
 
 Local fallback when unavailable
+
+<a id="nmap"></a>
 
 04 / NMAP ENGINE
 
@@ -244,6 +274,8 @@ High
 
 [!IMPORTANT]A High result is a heuristic signal based on observable services and headers. It does not prove that the target is compromised or internet-exposed.
 
+<a id="ai"></a>
+
 07 / GEMINI AI + LOCAL FALLBACK
 
 Gemini receives compact defensive context only:
@@ -357,6 +389,8 @@ vulnscanner/
 |-- .gitignore
 `-- README.md
 
+<a id="quick-start"></a>
+
 11 / QUICK START
 
 Prerequisites
@@ -404,6 +438,8 @@ npm install
 npm run dev
 
 Open http://localhost:5173.
+
+<a id="api"></a>
 
 12 / API CONTRACT
 
