@@ -1,163 +1,547 @@
-VulnScanner
+<div align="center">
 
-VulnScanner is a full-stack educational security assessment tool built with React and Flask. It checks a curated list of common TCP ports, reviews HTTP response headers, identifies selected exposed services, classifies risk, and provides concise AI-assisted recommendations.
+<h1>VULNSCANNER <sup>v2</sup></h1>
 
-Authorized use only: scan only systems you own or have explicit permission to assess. Results are educational indicators and must be verified manually.
+Surface the ports. Explain the risk.
 
-Live demo
+An AI-assisted network exposure assessment dashboard built for authorized defensive security testing.
 
-Frontend: vulnscanner-five.vercel.app
+REACT UI  ->  FLASK API  ->  NMAP + HTTP  ->  RISK ENGINE  ->  GEMINI
 
-The frontend remains publicly accessible. Scanner functionality depends on the separate Flask backend being online and correctly configured.
+</div>
 
-Features
+[!CAUTION]Authorized use only. Scan only systems you own or have explicit permission to assess. Results are educational indicators, not proof of compromise, and must be verified manually.
 
-Common TCP port scanning using Python sockets
+01 / MISSION
 
-Service identification for detected ports
+VulnScanner v2 transforms raw network observations into a focused defensive assessment. It resolves an authorized target, checks a curated list of TCP services with Nmap, reviews HTTP security headers, calculates a transparent heuristic risk score, and produces concise remediation guidance.
 
-HTTP response-header inspection
+The project was designed and engineered by Nahnu Rohmania as a cybersecurity portfolio project combining network discovery, secure API development, frontend product design, and generative AI.
 
-Detection of selected risky exposed services
+Assessment signal
 
-Low, medium, and high risk classification
+What VulnScanner reports
 
-Optional Gemini-generated security recommendations
+Target resolution
 
-Recent scan history in the browser session
+Normalized hostname and resolved IPv4 address
 
-Downloadable security report
+Port discovery
 
-Responsive React dashboard
+Reachable port, protocol, service, state, and version
 
-Architecture
+HTTP review
+
+Protocol, response status, headers, and availability
+
+Risk signals
+
+Severity, issue, affected port, and recommendation
+
+Risk model
+
+Explainable Low, Medium, or High heuristic score
+
+AI guidance
+
+Gemini-generated recommendations or deterministic fallback
+
+02 / INTERFACE PREVIEW
+
+<p align="center">
+  <img src="docs/screenshots/dashboard-overview.png" alt="VulnScanner v2 dashboard" width="100%" />
+</p>
+
+<table>
+  <tr>
+    <td width="50%" align="center"><b>Assessment Summary</b></td>
+    <td width="50%" align="center"><b>Exposure Report</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/assessment-result.png" alt="Target assessment result" /></td>
+    <td><img src="docs/screenshots/exposure-report.png" alt="Exposure report and remediation" /></td>
+  </tr>
+</table>
+
+03 / ASSESSMENT PIPELINE
 
 flowchart LR
-U["User"] --> F["React frontend"]
-F -->|POST /scan| B["Flask API"]
-B --> T["Authorized target"]
-B --> G["Gemini API"]
-B -->|JSON result| F
+U[Authorized User] --> F[React Dashboard]
+F -->|POST /scan| V[Target Validator]
+V --> N[Nmap Discovery]
+V --> H[HTTPS / HTTP Probe]
+N --> R[Risk Engine]
+H --> R
+R --> G{Gemini available?}
+G -->|Yes| AI[Gemini Remediation]
+G -->|No| FB[Local Fallback]
+AI --> O[Exposure Summary]
+FB --> O
+O --> F
 
-Technology stack
+Stage
 
-Layer
+Responsibility
 
-Technology
+Controlled behavior
 
-Frontend
+React Dashboard
 
-React, Vite, Axios, jsPDF
+Authorization gate, scan input, results, session history, print report
 
-Backend
+35-second request timeout
 
-Python, Flask, Flask-CORS, Requests
+Flask API
 
-Scanning
+Request validation, orchestration, CORS, safe errors
 
-Python sockets and HTTP-header analysis
+4096-byte JSON limit
 
-AI
+Target Validator
 
-Google GenAI SDK
+Normalize target, resolve IPv4, reject unsafe input
 
-Frontend hosting
+Private targets blocked by default
 
-Vercel
+Nmap Engine
 
-Project structure
+Targeted service and version discovery
+
+16 ports and 25-second host timeout
+
+HTTP Probe
+
+HTTPS-first header collection with HTTP fallback
+
+Short timeouts and no crawling
+
+Risk Engine
+
+Map observable signals to explainable findings
+
+Deterministic severity scoring
+
+Gemini Layer
+
+Generate three defensive recommendations
+
+Local fallback when unavailable
+
+04 / NMAP ENGINE
+
+VulnScanner uses a bounded Nmap profile rather than an unrestricted default scan:
+
+nmap -Pn -sT -sV --version-light -T4 --max-retries 1 --host-timeout 25s <target>
+
+Option
+
+Meaning
+
+Purpose
+
+-Pn
+
+Skip ICMP host discovery
+
+Continue when ping is filtered
+
+-sT
+
+TCP connect scan
+
+Works without raw-packet privileges
+
+-sV
+
+Service/version detection
+
+Adds context beyond port numbers
+
+--version-light
+
+Lightweight version probes
+
+Reduces discovery overhead
+
+-T4
+
+Faster timing profile
+
+Suitable for a controlled lab
+
+--max-retries 1
+
+Limit repeated probes
+
+Keeps execution bounded
+
+--host-timeout 25s
+
+Stop long scans
+
+Prevents hanging API requests
+
+Curated TCP ports
+
+21 FTP 22 SSH 23 Telnet 25 SMTP
+53 DNS 80 HTTP 110 POP3 135 MSRPC
+139 NetBIOS 143 IMAP 443 HTTPS 445 SMB
+3306 MySQL 3389 RDP 5432 PostgreSQL 8080 HTTP Proxy
+
+[!NOTE]The selected port set is intended for fast exposure triage. It is not comprehensive coverage and does not replace a full Nmap assessment.
+
+05 / HTTP SECURITY REVIEW
+
+The HTTP module attempts HTTPS first, falls back to HTTP, and collects observable response headers without crawling or exploiting the target.
+
+Content-Security-Policy Strict-Transport-Security (HTTPS only)
+X-Frame-Options X-Content-Type-Options
+Referrer-Policy
+
+A missing header becomes a transparent finding containing its severity, issue, affected web port, and a defensive recommendation.
+
+06 / HEURISTIC RISK MODEL
+
+Severity
+
+Score
+
+Example signal
+
+Low
+
+1
+
+Missing X-Frame-Options or Referrer-Policy
+
+Medium
+
+2
+
+FTP reachable or missing Content-Security-Policy
+
+High
+
+5
+
+Telnet, SMB, database, or RDP reachable
+
+Total score
+
+Displayed risk
+
+0-2
+
+Low
+
+3-7
+
+Medium
+
+8+
+
+High
+
+[!IMPORTANT]A High result is a heuristic signal based on observable services and headers. It does not prove that the target is compromised or internet-exposed.
+
+07 / GEMINI AI + LOCAL FALLBACK
+
+Gemini receives compact defensive context only:
+
+normalized target hostname;
+
+detected port and service pairs;
+
+heuristic risk classification; and
+
+up to ten findings containing severity and issue text.
+
+The prompt asks for exactly three concise defensive recommendations and explicitly prohibits exploitation instructions.
+
+Analysis source
+
+Dashboard badge
+
+Behavior
+
+Gemini API
+
+GEMINI GENERATED
+
+Returns model-generated defensive guidance
+
+Key missing / provider unavailable
+
+LOCAL FALLBACK
+
+Returns deterministic rule-based recommendations
+
+The API returns analysis_source: "gemini" or analysis_source: "fallback", allowing the frontend to identify the source honestly.
+
+08 / SECURITY CONTROLS
+
+Control
+
+Implementation
+
+Authorization gate
+
+Required confirmation before submitting a scan
+
+Input normalization
+
+Rejects credentials, custom ports, spaces, and malformed targets
+
+Private target protection
+
+Non-global targets blocked unless explicitly enabled for an owned lab
+
+DNS rebinding reduction
+
+Nmap receives the validated resolved IP
+
+Bounded scanning
+
+Curated ports, retries, host timeout, and frontend timeout
+
+Secret management
+
+Gemini API key loaded from environment variables
+
+Restricted CORS
+
+Allowed origins configured through CORS_ORIGINS
+
+Safe client errors
+
+Internal exceptions remain in backend logs
+
+Generated-file hygiene
+
+Reports, caches, environments, and dependencies ignored by Git
+
+09 / TECH STACK
+
+Interface
+
+API and analysis
+
+Engineering
+
+10 / PROJECT STRUCTURE
 
 vulnscanner/
-├── backend/
-│ ├── modules/
-│ ├── templates/
-│ ├── utils/
-│ ├── app.py
-│ ├── scanner.py
-│ └── requirements.txt
-├── frontend/
-│ ├── public/
-│ ├── src/
-│ ├── package.json
-│ └── vite.config.js
-├── .env.example
-├── .gitignore
-└── README.md
+|-- backend/
+| |-- modules/
+| | |-- http_scanner.py
+| | |-- port_scanner.py
+| | |-- target_validator.py
+| | `-- vuln_checker.py
+|   |-- utils/
+|   |-- app.py
+|   |-- scanner.py
+|   `-- requirements.txt
+|-- frontend/
+| |-- src/
+| | |-- App.jsx
+| | |-- App.css
+| | |-- index.css
+| | `-- main.jsx
+|   |-- .env.example
+|   |-- index.html
+|   |-- package.json
+|   `-- vite.config.js
+|-- docs/
+| `-- screenshots/
+|-- .env.example
+|-- .gitignore
+`-- README.md
 
-Run locally
+11 / QUICK START
 
-1. Backend
+Prerequisites
 
-From the project root in Windows PowerShell:
+Python 3.11 or newer
+
+Node.js and npm
+
+Nmap installed and available in PATH
+
+Gemini API key (optional)
+
+1. Clone the repository
+
+git clone https://github.com/bioonahnuu-design/vulnscanner.git
+cd vulnscanner
+
+2. Start the backend
 
 py -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
-pip install -r backend\requirements.txt
-$env:GEMINI_API_KEY="your_new_api_key"
+
+pip install -r .\backend\requirements.txt
+
+$env:GEMINI_API_KEY="your_api_key"
+$env:GEMINI_MODEL="gemini-2.5-flash"
+$env:CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
+$env:ALLOW_PRIVATE_TARGETS="true" # owned local lab only
 $env:FLASK_DEBUG="false"
-py backend\app.py
 
-The backend runs at http://127.0.0.1:5000 by default.
+python .\backend\app.py
 
-2. Frontend
+Backend health check:
 
-Open another terminal:
+Invoke-RestMethod http://127.0.0.1:5000/health
+
+3. Start the frontend
+
+Open a second terminal:
 
 cd frontend
+Copy-Item .env.example .env
 npm install
 npm run dev
 
-The frontend runs at http://localhost:5173.
+Open http://localhost:5173.
 
-Environment variables
+12 / API CONTRACT
 
-GEMINI_API_KEY=replace_with_your_new_api_key
-FLASK_DEBUG=false
+Health check
 
-Never commit a real .env file or API key. The committed .env.example file must contain placeholders only.
+GET /health
 
-API
-
-GET /
-
-Checks whether the Flask backend is running.
+Authorized assessment
 
 POST /scan
-
-Example request:
+Content-Type: application/json
 
 {
-"target": "example.com"
+"target": "127.0.0.1"
 }
 
-The response contains the target, resolved IP address, detected open ports, HTTP headers, risk classification, selected findings, and security recommendations.
+<details>
+<summary><b>Example response shape</b></summary>
 
-Limitations
+{
+"target": "127.0.0.1",
+"ip": "127.0.0.1",
+"risk": "High",
+"risk_score": 10,
+"ports": [],
+"headers": {},
+"http": {},
+"vulnerabilities": [],
+"severity_count": {
+"High": 2,
+"Medium": 0,
+"Low": 0
+},
+"ai_analysis": "Defensive recommendations...",
+"analysis_source": "gemini"
+}
 
-Scans only a curated list of common ports
+</details>
 
-Does not perform exploitation or authenticated testing
+13 / VALIDATION
 
-Does not replace Nmap, a professional vulnerability scanner, or a penetration test
+# Backend syntax
 
-Risk classification is heuristic and requires manual verification
+py -m py_compile `  .\backend\app.py`
+.\backend\modules\target_validator.py `  .\backend\modules\port_scanner.py`
+.\backend\modules\http_scanner.py `
+.\backend\modules\vuln_checker.py
 
-Public hosting providers may restrict outbound port connections
+# Frontend quality checks
 
-Roadmap
+cd frontend
+npm run lint
+npm run build
 
-Deploy the Flask backend to a new hosting provider
+Check
 
-Configure the frontend API URL through an environment variable
+Status
 
-Add stricter target validation and private-IP protection
+Python module compilation
 
-Add request rate limiting
+PASS
 
-Add automated frontend and backend tests
+ESLint
 
-Improve report formatting and accessibility
+PASS
 
-Author
+Vite production build
 
-Developed by Nahnu Rohmania as a cybersecurity portfolio project.
+PASS
+
+Authorized local scan against 127.0.0.1
+
+PASS
+
+14 / LIMITATIONS & ROADMAP
+
+Current limitations
+
+Only 16 selected TCP ports are checked.
+
+Reachability does not prove public exposure or exploitability.
+
+Service banners and HTTP headers may be incomplete or misleading.
+
+Scan history exists only in the current browser session.
+
+Public hosting providers may restrict outbound port scanning.
+
+This project does not perform exploitation or authenticated testing.
+
+Planned improvements
+
+Add persistent scan history with privacy-aware retention.
+
+Add configurable authorized port profiles.
+
+Add rate limiting and production observability.
+
+Add automated backend and frontend tests.
+
+Add signed report metadata and improved accessibility.
+
+Deploy the Nmap-capable backend to a suitable controlled environment.
+
+15 / DEPLOYMENT STATUS
+
+Component
+
+Status
+
+Notes
+
+React frontend
+
+Online
+
+Hosted on Vercel
+
+Flask API
+
+Local / redeploy required
+
+Requires Nmap-capable runtime and environment secrets
+
+Gemini
+
+Optional
+
+Enabled only when a valid API key is configured
+
+[!NOTE]The public frontend may remain accessible while scan functionality is unavailable if the separate Flask backend is offline.
+
+<div align="center">
+
+NAHNU SECURITY LAB
+
+Designed and engineered by Nahnu RohmaniaInformatics Engineering student at Universitas 17 Agustus 1945 Surabaya
+
+EDUCATIONAL   DEFENSIVE   AUTHORIZED
+
+</div>
