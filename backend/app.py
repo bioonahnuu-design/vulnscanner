@@ -1,6 +1,7 @@
 from google import genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 import socket
 import requests
 import urllib3
@@ -14,9 +15,9 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # GEMINI SETUP
-client = genai.Client(
-    api_key="AIzaSyBd76gKZDWOLkj9wXQ5UIU3Xz_eaJhgg_o"
-)
+# Secrets must be configured through environment variables and never committed.
+gemini_api_key = os.getenv("GEMINI_API_KEY", "").strip()
+client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
 
 COMMON_PORTS = {
     21: "ftp",
@@ -189,24 +190,22 @@ Give:
 Maximum 3 bullet points.
 """
 
-        try:
+        ai_analysis = (
+            "• Several ports are publicly accessible.\n\n"
+            "• Open ports may increase attack surface.\n\n"
+            "• Ensure firewall protection is enabled and disable unused services."
+        )
 
-            response = client.models.generate_content(
-                model="gemini-1.5-flash",
-                contents=prompt
-            )
-
-            ai_analysis = response.text
-
-        except Exception:
-
-            ai_analysis = (
-                "• Several ports are publicly accessible.\n\n"
-                "• Open ports may increase attack surface.\n\n"
-                "• Ensure firewall protection is enabled.\n\n"
-                "• Disable unused services if possible.\n\n"
-                "• Use strong authentication for exposed services."
-            )
+        if client is not None:
+            try:
+                response = client.models.generate_content(
+                    model="gemini-1.5-flash",
+                    contents=prompt
+                )
+                ai_analysis = response.text
+            except Exception:
+                # The scanner remains usable when the AI provider is unavailable.
+                pass
 
         return jsonify({
             "target": target,
@@ -232,5 +231,5 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=5000,
-        debug=True
+        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true"
     )

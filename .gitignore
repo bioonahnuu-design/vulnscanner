@@ -1,2 +1,30 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node / Vite
 node_modules/
 frontend/node_modules/
+frontend/dist/
+
+# Generated scanner reports
+backend/hasil.json
+backend/multi.json
+backend/report.html
+backend/report.json
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
