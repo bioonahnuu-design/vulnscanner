@@ -1,270 +1,176 @@
 <p align="center">
-  <img src="docs/assets/vulnscanner-banner.svg" alt="VulnScanner v2 — Nahnu Security Lab" width="100%" />
+  <img src="docs/assets/vulnscanner-banner.svg" width="100%" alt="VulnScanner — Nahnu Security Lab" />
 </p>
 
-<div align="center">
+<h1 align="center">VulnScanner v2</h1>
 
-A focused network-exposure assessor for authorized defensive security testing.
+<p align="center">
+  <b>Surface the ports. Explain the risk.</b><br>
+  An AI-assisted network exposure dashboard for authorized defensive assessments.
+</p>
 
-REACT UI  ->  FLASK API  ->  NMAP + HTTP  ->  RISK ENGINE  ->  GEMINI
+<p align="center">
+  <a href="https://vulnscanner-five.vercel.app"><img src="https://img.shields.io/badge/LIVE_DEMO-16A36A?style=for-the-badge&logo=vercel&logoColor=white" alt="Live demo"></a>
+  <a href="https://github.com/bioonahnuu-design/vulnscanner"><img src="https://img.shields.io/badge/SOURCE_CODE-101418?style=for-the-badge&logo=github&logoColor=white" alt="Source code"></a>
+  <img src="https://img.shields.io/badge/STATUS-ACTIVE-62F2B2?style=for-the-badge&labelColor=102019" alt="Status active">
+</p>
 
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React">
+  <img src="https://img.shields.io/badge/Vite_8-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white" alt="Flask">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Nmap-004170?style=flat-square&logo=linux&logoColor=white" alt="Nmap">
+  <img src="https://img.shields.io/badge/Gemini-4285F4?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini">
+</p>
+
+[!CAUTION]Authorized use only. Scan only infrastructure you own or have explicit permission to assess. A risk result is an educational heuristic—not proof that a system has been compromised.
+
+🖥️ Interface Preview
+
+<p align="center">
+  <img src="docs/screenshots/dashboard-overview.png" width="100%" alt="VulnScanner dashboard overview" />
+</p>
+
+<table>
+  <tr>
+    <th width="50%">Assessment Summary</th>
+    <th width="50%">Exposure & Remediation</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/assessment-result.png" alt="Assessment summary"></td>
+    <td><img src="docs/screenshots/exposure-report.png" alt="Exposure report"></td>
+  </tr>
+</table>
+
+⚡ Security Assessment Modules
+
+<table>
+  <tr>
+    <th>Module</th>
+    <th>Purpose</th>
+    <th>Evidence Produced</th>
+  </tr>
+  <tr>
+    <td>🔎 <b>Target Validator</b></td>
+    <td>Normalizes input, resolves IPv4, and rejects malformed targets</td>
+    <td>Validated hostname and resolved address</td>
+  </tr>
+  <tr>
+    <td>📡 <b>Nmap Engine</b></td>
+    <td>Runs bounded TCP service and lightweight version discovery</td>
+    <td>Port, protocol, state, service, and version</td>
+  </tr>
+  <tr>
+    <td>🌐 <b>HTTP Review</b></td>
+    <td>Attempts HTTPS first and inspects observable response headers</td>
+    <td>Protocol, status code, availability, and headers</td>
+  </tr>
+  <tr>
+    <td>🚨 <b>Risk Engine</b></td>
+    <td>Maps exposed services and missing headers to explainable findings</td>
+    <td>Severity count, findings, and heuristic score</td>
+  </tr>
+  <tr>
+    <td>🤖 <b>Gemini Brief</b></td>
+    <td>Generates concise defensive remediation guidance</td>
+    <td>Three recommendations with transparent source label</td>
+  </tr>
+  <tr>
+    <td>🧰 <b>Local Fallback</b></td>
+    <td>Keeps analysis usable when Gemini is unavailable</td>
+    <td>Deterministic rule-based recommendations</td>
+  </tr>
+</table>
+
+🔁 Assessment Pipeline
+
+flowchart LR
+A[Authorized Operator] --> B[React Dashboard]
+B -->|POST /scan| C[Flask API]
+C --> D[Target Validator]
+D --> E[Nmap Discovery]
+D --> F[HTTPS / HTTP Probe]
+E --> G[Risk Engine]
+F --> G
+G --> H{Gemini configured?}
+H -->|Yes| I[Gemini Brief]
+H -->|No| J[Local Fallback]
+I --> K[Exposure Report]
+J --> K
+K --> B
 
 <table>
   <tr>
     <td align="center"><sub>ENGINE</sub><br><b>NMAP 7.x</b></td>
-    <td align="center"><sub>MODE</sub><br><b>DEFENSIVE</b></td>
-    <td align="center"><sub>AI LAYER</sub><br><b>GEMINI + FALLBACK</b></td>
+    <td align="center"><sub>SCAN MODE</sub><br><b>BOUNDED</b></td>
     <td align="center"><sub>RISK MODEL</sub><br><b>HEURISTIC</b></td>
-    <td align="center"><sub>RELEASE</sub><br><b>v2.0.0</b></td>
+    <td align="center"><sub>AI SOURCE</sub><br><b>TRANSPARENT</b></td>
+    <td align="center"><sub>POLICY</sub><br><b>AUTHORIZED</b></td>
   </tr>
 </table>
 
-<p align="center">
-  <a href="#mission">Mission</a> •
-  <a href="#interface">Interface</a> •
-  <a href="#pipeline">Pipeline</a> •
-  <a href="#nmap">Nmap</a> •
-  <a href="#ai">AI Layer</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#api">API</a>
+🧰 Technology Stack
+
+Frontend
+
+<p>
+  <img src="https://img.shields.io/badge/REACT_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19">
+  <img src="https://img.shields.io/badge/VITE_8-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 8">
+  <img src="https://img.shields.io/badge/RESPONSIVE_CSS-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS">
 </p>
 
-[!CAUTION]Authorized use only. Scan only systems you own or have explicit permission to assess. Results are educational indicators, not proof of compromise, and must be verified manually.
+Backend & Analysis
 
-<a id="mission"></a>
-
-01 / MISSION
-
-VulnScanner v2 transforms raw network observations into a focused defensive assessment. It resolves an authorized target, checks a curated list of TCP services with Nmap, reviews HTTP security headers, calculates a transparent heuristic risk score, and produces concise remediation guidance.
-
-The project was designed and engineered by Nahnu Rohmania as a cybersecurity portfolio project combining network discovery, secure API development, frontend product design, and generative AI.
-
-Assessment signal
-
-What VulnScanner reports
-
-Target resolution
-
-Normalized hostname and resolved IPv4 address
-
-Port discovery
-
-Reachable port, protocol, service, state, and version
-
-HTTP review
-
-Protocol, response status, headers, and availability
-
-Risk signals
-
-Severity, issue, affected port, and recommendation
-
-Risk model
-
-Explainable Low, Medium, or High heuristic score
-
-AI guidance
-
-Gemini-generated recommendations or deterministic fallback
-
-<a id="interface"></a>
-
-02 / INTERFACE PREVIEW
-
-Operator view. The interface prioritizes evidence over decoration: resolved target, open services, HTTP signals, heuristic score, scan duration, timestamp, and the source of remediation guidance.
-
-<p align="center">
-  <img src="docs/screenshots/dashboard-overview.png" alt="VulnScanner v2 dashboard" width="100%" />
+<p>
+  <img src="https://img.shields.io/badge/PYTHON-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/FLASK-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
+  <img src="https://img.shields.io/badge/NMAP-004170?style=for-the-badge&logo=linux&logoColor=white" alt="Nmap">
+  <img src="https://img.shields.io/badge/GOOGLE_GEMINI-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini">
 </p>
+
+Quality & Delivery
+
+<p>
+  <img src="https://img.shields.io/badge/ESLINT-4B32C3?style=for-the-badge&logo=eslint&logoColor=white" alt="ESLint">
+  <img src="https://img.shields.io/badge/GITHUB-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  <img src="https://img.shields.io/badge/VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel">
+</p>
+
+📊 Transparent Risk Model
 
 <table>
   <tr>
-    <td width="50%" align="center"><b>Assessment Summary</b></td>
-    <td width="50%" align="center"><b>Exposure Report</b></td>
+    <th>Severity</th>
+    <th>Weight</th>
+    <th>Example Signal</th>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/assessment-result.png" alt="Target assessment result" /></td>
-    <td><img src="docs/screenshots/exposure-report.png" alt="Exposure report and remediation" /></td>
+    <td>🟢 <b>Low</b></td>
+    <td><code>1</code></td>
+    <td>Missing X-Frame-Options or Referrer-Policy</td>
+  </tr>
+  <tr>
+    <td>🟡 <b>Medium</b></td>
+    <td><code>2</code></td>
+    <td>FTP reachable or missing Content-Security-Policy</td>
+  </tr>
+  <tr>
+    <td>🔴 <b>High</b></td>
+    <td><code>5</code></td>
+    <td>Telnet, SMB, database, or RDP reachable</td>
   </tr>
 </table>
 
-<a id="pipeline"></a>
+Total Score
 
-03 / ASSESSMENT PIPELINE
+Dashboard Classification
 
-flowchart LR
-U[Authorized User] --> F[React Dashboard]
-F -->|POST /scan| V[Target Validator]
-V --> N[Nmap Discovery]
-V --> H[HTTPS / HTTP Probe]
-N --> R[Risk Engine]
-H --> R
-R --> G{Gemini available?}
-G -->|Yes| AI[Gemini Remediation]
-G -->|No| FB[Local Fallback]
-AI --> O[Exposure Summary]
-FB --> O
-O --> F
-
-Stage
-
-Responsibility
-
-Controlled behavior
-
-React Dashboard
-
-Authorization gate, scan input, results, session history, print report
-
-35-second request timeout
-
-Flask API
-
-Request validation, orchestration, CORS, safe errors
-
-4096-byte JSON limit
-
-Target Validator
-
-Normalize target, resolve IPv4, reject unsafe input
-
-Private targets blocked by default
-
-Nmap Engine
-
-Targeted service and version discovery
-
-16 ports and 25-second host timeout
-
-HTTP Probe
-
-HTTPS-first header collection with HTTP fallback
-
-Short timeouts and no crawling
-
-Risk Engine
-
-Map observable signals to explainable findings
-
-Deterministic severity scoring
-
-Gemini Layer
-
-Generate three defensive recommendations
-
-Local fallback when unavailable
-
-<a id="nmap"></a>
-
-04 / NMAP ENGINE
-
-VulnScanner uses a bounded Nmap profile rather than an unrestricted default scan:
-
-nmap -Pn -sT -sV --version-light -T4 --max-retries 1 --host-timeout 25s <target>
-
-Option
-
-Meaning
-
-Purpose
-
--Pn
-
-Skip ICMP host discovery
-
-Continue when ping is filtered
-
--sT
-
-TCP connect scan
-
-Works without raw-packet privileges
-
--sV
-
-Service/version detection
-
-Adds context beyond port numbers
-
---version-light
-
-Lightweight version probes
-
-Reduces discovery overhead
-
--T4
-
-Faster timing profile
-
-Suitable for a controlled lab
-
---max-retries 1
-
-Limit repeated probes
-
-Keeps execution bounded
-
---host-timeout 25s
-
-Stop long scans
-
-Prevents hanging API requests
-
-Curated TCP ports
-
-21 FTP 22 SSH 23 Telnet 25 SMTP
-53 DNS 80 HTTP 110 POP3 135 MSRPC
-139 NetBIOS 143 IMAP 443 HTTPS 445 SMB
-3306 MySQL 3389 RDP 5432 PostgreSQL 8080 HTTP Proxy
-
-[!NOTE]The selected port set is intended for fast exposure triage. It is not comprehensive coverage and does not replace a full Nmap assessment.
-
-05 / HTTP SECURITY REVIEW
-
-The HTTP module attempts HTTPS first, falls back to HTTP, and collects observable response headers without crawling or exploiting the target.
-
-Content-Security-Policy Strict-Transport-Security (HTTPS only)
-X-Frame-Options X-Content-Type-Options
-Referrer-Policy
-
-A missing header becomes a transparent finding containing its severity, issue, affected web port, and a defensive recommendation.
-
-06 / HEURISTIC RISK MODEL
-
-Severity
-
-Score
-
-Example signal
+0–2
 
 Low
 
-1
-
-Missing X-Frame-Options or Referrer-Policy
-
-Medium
-
-2
-
-FTP reachable or missing Content-Security-Policy
-
-High
-
-5
-
-Telnet, SMB, database, or RDP reachable
-
-Total score
-
-Displayed risk
-
-0-2
-
-Low
-
-3-7
+3–7
 
 Medium
 
@@ -272,128 +178,72 @@ Medium
 
 High
 
-[!IMPORTANT]A High result is a heuristic signal based on observable services and headers. It does not prove that the target is compromised or internet-exposed.
+[!IMPORTANT]The score communicates observable exposure signals. Reachability does not automatically mean public exposure, exploitation, or compromise.
 
-<a id="ai"></a>
+🤖 Gemini AI with Honest Fallback
 
-07 / GEMINI AI + LOCAL FALLBACK
+Analysis Source
 
-Gemini receives compact defensive context only:
+Dashboard Label
 
-normalized target hostname;
+Behaviour
 
-detected port and service pairs;
-
-heuristic risk classification; and
-
-up to ten findings containing severity and issue text.
-
-The prompt asks for exactly three concise defensive recommendations and explicitly prohibits exploitation instructions.
-
-Analysis source
-
-Dashboard badge
-
-Behavior
-
-Gemini API
+Gemini API available
 
 GEMINI GENERATED
 
-Returns model-generated defensive guidance
+Generates exactly three concise defensive recommendations
 
-Key missing / provider unavailable
+Key missing or provider unavailable
 
 LOCAL FALLBACK
 
-Returns deterministic rule-based recommendations
+Uses deterministic recommendations from local security rules
 
-The API returns analysis_source: "gemini" or analysis_source: "fallback", allowing the frontend to identify the source honestly.
+Only compact defensive context is sent to Gemini: the normalized target, detected services, risk classification, and finding summaries. The prompt explicitly excludes exploitation guidance.
 
-08 / SECURITY CONTROLS
+🔐 Defensive Controls
 
 Control
 
 Implementation
 
-Authorization gate
+✅ Authorization gate
 
-Required confirmation before submitting a scan
+Operator must confirm ownership or explicit permission
 
-Input normalization
+✅ Target normalization
 
-Rejects credentials, custom ports, spaces, and malformed targets
+Rejects credentials, spaces, custom ports, and malformed input
 
-Private target protection
+✅ Private-target policy
 
-Non-global targets blocked unless explicitly enabled for an owned lab
+Private targets are blocked unless deliberately enabled for an owned lab
 
-DNS rebinding reduction
+✅ DNS rebinding reduction
 
-Nmap receives the validated resolved IP
+Nmap receives the already validated IP address
 
-Bounded scanning
+✅ Bounded scan
 
-Curated ports, retries, host timeout, and frontend timeout
+Curated ports, limited retries, and a host timeout
 
-Secret management
+✅ Secret isolation
 
-Gemini API key loaded from environment variables
+Gemini credentials are loaded from backend environment variables
 
-Restricted CORS
+✅ Restricted CORS
 
-Allowed origins configured through CORS_ORIGINS
+Permitted frontend origins come from CORS_ORIGINS
 
-Safe client errors
+✅ Safe error responses
 
 Internal exceptions remain in backend logs
 
-Generated-file hygiene
+🚀 Quick Start
 
-Reports, caches, environments, and dependencies ignored by Git
-
-09 / TECH STACK
-
-Interface
-
-API and analysis
-
-Engineering
-
-10 / PROJECT STRUCTURE
-
-vulnscanner/
-|-- backend/
-| |-- modules/
-| | |-- http_scanner.py
-| | |-- port_scanner.py
-| | |-- target_validator.py
-| | `-- vuln_checker.py
-|   |-- utils/
-|   |-- app.py
-|   |-- scanner.py
-|   `-- requirements.txt
-|-- frontend/
-| |-- src/
-| | |-- App.jsx
-| | |-- App.css
-| | |-- index.css
-| | `-- main.jsx
-|   |-- .env.example
-|   |-- index.html
-|   |-- package.json
-|   `-- vite.config.js
-|-- docs/
-| `-- screenshots/
-|-- .env.example
-|-- .gitignore
-`-- README.md
-
-<a id="quick-start"></a>
-
-11 / QUICK START
-
-Prerequisites
+<details>
+<summary><b>1 — Requirements and environment variables</b></summary>
 
 Python 3.11 or newer
 
@@ -403,34 +253,37 @@ Nmap installed and available in PATH
 
 Gemini API key (optional)
 
-1. Clone the repository
+GEMINI_API_KEY=replace_with_your_key
+GEMINI_MODEL=gemini-2.5-flash
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+ALLOW_PRIVATE_TARGETS=true
+FLASK_DEBUG=false
+PORT=5000
+
+ALLOW_PRIVATE_TARGETS=true should only be used for a lab you own.
+
+</details>
+
+<details>
+<summary><b>2 — Start the Flask backend</b></summary>
 
 git clone https://github.com/bioonahnuu-design/vulnscanner.git
 cd vulnscanner
 
-2. Start the backend
-
 py -m venv .venv
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
-
 pip install -r .\backend\requirements.txt
-
-$env:GEMINI_API_KEY="your_api_key"
-$env:GEMINI_MODEL="gemini-2.5-flash"
-$env:CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
-$env:ALLOW_PRIVATE_TARGETS="true" # owned local lab only
-$env:FLASK_DEBUG="false"
-
 python .\backend\app.py
 
-Backend health check:
+Health check:
 
 Invoke-RestMethod http://127.0.0.1:5000/health
 
-3. Start the frontend
+</details>
 
-Open a second terminal:
+<details>
+<summary><b>3 — Start the React frontend</b></summary>
 
 cd frontend
 Copy-Item .env.example .env
@@ -439,15 +292,90 @@ npm run dev
 
 Open http://localhost:5173.
 
-<a id="api"></a>
+</details>
 
-12 / API CONTRACT
+📡 Nmap Profile
 
-Health check
+nmap -Pn -sT -sV --version-light -T4 --max-retries 1 --host-timeout 25s <target>
+
+Option
+
+Purpose
+
+-Pn
+
+Continue when ICMP discovery is filtered
+
+-sT
+
+Use a TCP connect scan without raw-packet privileges
+
+-sV --version-light
+
+Add lightweight service-version context
+
+-T4
+
+Use a faster timing profile for a controlled assessment
+
+--max-retries 1
+
+Keep repeated probes bounded
+
+--host-timeout 25s
+
+Prevent a scan from hanging the API
+
+<details>
+<summary><b>View the curated TCP port profile</b></summary>
+
+21 FTP 22 SSH 23 Telnet 25 SMTP
+53 DNS 80 HTTP 110 POP3 135 MSRPC
+139 NetBIOS 143 IMAP 443 HTTPS 445 SMB
+3306 MySQL 3389 RDP 5432 PostgreSQL
+8080 HTTP Proxy
+
+</details>
+
+📁 Project Structure
+
+vulnscanner/
+├── backend/
+│ ├── modules/
+│ │ ├── http_scanner.py
+│ │ ├── port_scanner.py
+│ │ ├── target_validator.py
+│ │ └── vuln_checker.py
+│ ├── app.py
+│ ├── scanner.py
+│ └── requirements.txt
+├── frontend/
+│ ├── src/
+│ ├── .env.example
+│ ├── package.json
+│ └── vite.config.js
+├── docs/
+│ ├── assets/
+│ └── screenshots/
+├── .env.example
+├── .gitignore
+└── README.md
+
+🔌 API Contract
+
+<details>
+<summary><b>GET /health</b></summary>
 
 GET /health
 
-Authorized assessment
+{
+"status": "healthy"
+}
+
+</details>
+
+<details>
+<summary><b>POST /scan</b></summary>
 
 POST /scan
 Content-Type: application/json
@@ -456,95 +384,65 @@ Content-Type: application/json
 "target": "127.0.0.1"
 }
 
-<details>
-<summary><b>Example response shape</b></summary>
-
-{
-"target": "127.0.0.1",
-"ip": "127.0.0.1",
-"risk": "High",
-"risk_score": 10,
-"ports": [],
-"headers": {},
-"http": {},
-"vulnerabilities": [],
-"severity_count": {
-"High": 2,
-"Medium": 0,
-"Low": 0
-},
-"ai_analysis": "Defensive recommendations...",
-"analysis_source": "gemini"
-}
+The response includes the resolved IP, detected ports, HTTP evidence, findings, severity counts, risk score, remediation brief, and analysis_source.
 
 </details>
 
-13 / VALIDATION
+✅ Validation
 
-# Backend syntax
+Check
 
-py -m py_compile `  .\backend\app.py`
-.\backend\modules\target_validator.py `  .\backend\modules\port_scanner.py`
-.\backend\modules\http_scanner.py `
-.\backend\modules\vuln_checker.py
+Result
 
-# Frontend quality checks
+Python module compilation
+
+✅ PASS
+
+ESLint
+
+✅ PASS
+
+Vite production build
+
+✅ PASS
+
+Authorized local assessment against 127.0.0.1
+
+✅ PASS
+
+py -m py_compile .\backend\app.py .\backend\modules\target_validator.py .\backend\modules\port_scanner.py .\backend\modules\http_scanner.py .\backend\modules\vuln_checker.py
 
 cd frontend
 npm run lint
 npm run build
 
-Check
+🗺️ Roadmap
 
-Status
+React operator dashboard
 
-Python module compilation
+Targeted Nmap service discovery
 
-PASS
+HTTPS-first header review
 
-ESLint
+Explainable risk scoring
 
-PASS
+Gemini remediation with local fallback
 
-Vite production build
+Input validation and controlled private-target policy
 
-PASS
+Persistent scan history with privacy-aware retention
 
-Authorized local scan against 127.0.0.1
+Configurable authorized port profiles
 
-PASS
+Rate limiting and production observability
 
-14 / LIMITATIONS & ROADMAP
+Automated backend and frontend test suite
 
-Current limitations
+Signed report metadata and accessibility improvements
 
-Only 16 selected TCP ports are checked.
+Nmap-capable backend deployment in a controlled environment
 
-Reachability does not prove public exposure or exploitability.
-
-Service banners and HTTP headers may be incomplete or misleading.
-
-Scan history exists only in the current browser session.
-
-Public hosting providers may restrict outbound port scanning.
-
-This project does not perform exploitation or authenticated testing.
-
-Planned improvements
-
-Add persistent scan history with privacy-aware retention.
-
-Add configurable authorized port profiles.
-
-Add rate limiting and production observability.
-
-Add automated backend and frontend tests.
-
-Add signed report metadata and improved accessibility.
-
-Deploy the Nmap-capable backend to a suitable controlled environment.
-
-15 / DEPLOYMENT STATUS
+☁️ Deployment
 
 Component
 
@@ -552,32 +450,35 @@ Status
 
 Notes
 
-React frontend
+React dashboard
 
-Online
+🟢 Online
 
 Hosted on Vercel
 
-Flask API
+Flask + Nmap API
 
-Local / redeploy required
+🟡 Local / redeploy
 
-Requires Nmap-capable runtime and environment secrets
+Requires an Nmap-capable runtime
 
-Gemini
+Gemini analysis
 
-Optional
+🔵 Optional
 
-Enabled only when a valid API key is configured
+Enabled through backend environment variables
 
-[!NOTE]The public frontend may remain accessible while scan functionality is unavailable if the separate Flask backend is offline.
+The public interface may remain online while scanning is unavailable when the separate backend is offline.
 
-<div align="center">
+<p align="center">
+  <b>NAHNU SECURITY LAB / TOOL 02</b><br>
+  Designed and engineered by <a href="https://github.com/bioonahnuu-design"><b>Nahnu Rohmania</b></a><br>
+  Informatics Engineering · Universitas 17 Agustus 1945 Surabaya
+</p>
 
-NAHNU SECURITY LAB
+<p align="center">
+  <a href="https://github.com/bioonahnuu-design"><img src="https://img.shields.io/badge/GITHUB-bioonahnuu--design-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+  <a href="mailto:bioonahnuu@gmail.com"><img src="https://img.shields.io/badge/EMAIL-CONTACT-16A36A?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"></a>
+</p>
 
-Designed and engineered by Nahnu RohmaniaInformatics Engineering student at Universitas 17 Agustus 1945 Surabaya
-
-EDUCATIONAL   DEFENSIVE   AUTHORIZED
-
-</div>
+<p align="center"><code>EDUCATIONAL</code> · <code>DEFENSIVE</code> · <code>AUTHORIZED</code></p>
